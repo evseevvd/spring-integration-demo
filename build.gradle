@@ -1,0 +1,47 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot', version: '2.1.2.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.1.2.RELEASE'
+
+    compile 'org.springframework:spring-beans:5.1.2.RELEASE'
+    compile 'org.springframework:spring-context:5.1.2.RELEASE'
+    compile 'org.springframework:spring-web:5.1.2.RELEASE'
+
+    compile 'org.springframework.integration:spring-integration-core:5.1.0.RELEASE'
+    compile 'org.springframework.integration:spring-integration-jms:5.1.0.RELEASE'
+    compile 'org.springframework.integration:spring-integration-xml:5.1.0.RELEASE'
+    
+    compile 'org.apache.activemq:activemq-broker:5.15.8'
+    compile 'javax.servlet:javax.servlet-api:3.1.0'
+}
+
+/*
+*         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>2.1.1.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+            <version>5.15.8</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.activation/activation -->
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1</version>
+        </dependency>*/
