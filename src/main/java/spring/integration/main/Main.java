@@ -22,7 +22,7 @@ import javax.jms.ConnectionFactory;
 @EnableAutoConfiguration
 public class Main extends SpringBootServletInitializer {
 
-    private static final ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm:/localhost?broker.persistent=false");
+    private static final ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm:/localhost?broker.persistent=false");
     static final String OUT_QUEUE = "test.out";
     static final String IN_QUEUE = "test.in";
 
@@ -30,11 +30,13 @@ public class Main extends SpringBootServletInitializer {
         SpringApplication.run(Main.class, args);
         JmsTemplate template = new JmsTemplate(connectionFactory);
         template.setDefaultDestinationName(IN_QUEUE);
-        template.convertAndSend("Test");
+        Person persone = new Person("Mikle", "+79856421");
+        template.convertAndSend(persone);
     }
 
     @Bean
     public ConnectionFactory connectionFactory() {
+        connectionFactory.setTrustAllPackages(true);
         return connectionFactory;
     }
 
@@ -55,10 +57,11 @@ public class Main extends SpringBootServletInitializer {
     @Bean
     public IntegrationFlow integrationFlow() {
         return IntegrationFlows.from("msgProcess")
-                .<String, String>transform(source -> source + " transformed")
-                .handle(message -> {
-            System.out.println("from chanel " + message.getPayload());
-        })
+                .<Person, GenericMessage>transform(source -> {
+                    source.setName("Mikle 2");
+                    return new GenericMessage<>(source);
+                })
+                .handle(message -> System.out.println("from chanel " + ((Person)message.getPayload()).getName()))
                 .get();
     }
 
