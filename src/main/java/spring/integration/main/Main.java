@@ -13,7 +13,8 @@ import org.springframework.integration.jms.dsl.*;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
-import org.springframework.messaging.support.GenericMessage;
+import org.springframework.messaging.*;
+import org.springframework.messaging.support.*;
 
 import javax.jms.ConnectionFactory;
 
@@ -23,7 +24,9 @@ import javax.jms.ConnectionFactory;
 public class Main extends SpringBootServletInitializer {
 
     private static final ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm:/localhost?broker.persistent=false");
+
     static final String OUT_QUEUE = "test.out";
+
     static final String IN_QUEUE = "test.in";
 
     public static void main(String[] args) {
@@ -51,7 +54,10 @@ public class Main extends SpringBootServletInitializer {
 
     @Bean
     public JmsMessageDrivenEndpoint adapter(DefaultMessageListenerContainer container) {
-        return Jms.messageDrivenChannelAdapter(container).outputChannel("msgProcess").autoStartup(true).get();
+        return Jms.messageDrivenChannelAdapter(container)
+                .outputChannel("msgProcess")
+                .errorChannel("errorChannel")
+                .autoStartup(true).get();
     }
 
     @Bean
@@ -61,7 +67,25 @@ public class Main extends SpringBootServletInitializer {
                     source.setName("Mikle 2");
                     return new GenericMessage<>(source);
                 })
-                .handle(message -> System.out.println("from chanel " + ((Person)message.getPayload()).getName()))
+                .handle(message -> {
+                    Person p = (Person) message.getPayload();
+                    if (!p.getName().equals("tre")) {
+                        throw new IllegalArgumentException("Wrong name");
+                    } else {
+                        System.out.println("from chanel " + p.getName());
+                    }
+                })
+                .get();
+    }
+
+    @Bean
+    public IntegrationFlow errorChannelFlow() {
+        return IntegrationFlows.from("errorChannel")
+                .handle(m -> {
+                    MessagingException e = (MessagingException) m.getPayload();
+
+                    System.out.println(e.getFailedMessage().getPayload());
+                })
                 .get();
     }
 
